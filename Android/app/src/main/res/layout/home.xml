@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".Home">
+
+    <!-- Hello -->
+    <TextView
+        android:id="@+id/home_greeting_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/greeting_good_morning"
+
+        />
+
+    <!--    Guest / Name -->
+    <TextView
+        android:id="@+id/home_greeting_to"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/greeting_to_guest"
+
+        />
+
+    <!--    radio button for enable/disable -->
+    <Switch
+        android:onClick="activate_breathe"
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--  I Work on  -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_i_work_on"
+        android:layout_marginTop="16dp"
+
+        />
+
+
+    <!--    week day picker -->
+    <ca.antonious.materialdaypicker.MaterialDayPicker
+        android:id="@+id/day_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--    Between -->
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_between" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- start Time picker    -->
+        <TextView
+            android:id="@+id/work_start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9 AM"
+            android:onClick="showTimePicker"
+            />
+
+        <!--   - -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+
+            android:text="and" />
+        <!--    end time picker-->
+        <TextView
+            android:id="@+id/work_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 PM"
+            android:onClick="showTimePicker"
+            />
+    </LinearLayout>
+
+
+    <!--    Remind me for Breathe every -->
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/message_remind_break" />
+
+    <!--    spinner for selecting time (30min, 45min, 60 min, 90min, 120min) -->
+   <Spinner
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/home_break_time_gap"
+       ></Spinner>
+</LinearLayout>
