@@ -1,68 +1,54 @@
 package com.subham.breathe;
 
 
+import java.util.Calendar;
+import java.util.HashSet;
+
+import ca.antonious.materialdaypicker.MaterialDayPicker;
+
 class Config {
-    String Id;
-    String Email;
-    String Name;
-    String[] WorkDays;
-    String StartTime;
-    String EndTime;
-    int breakTimeInMinutes;
+    public String Id;
+    public String Email;
+    public String Name;
+    public HashSet<MaterialDayPicker.Weekday> WorkDays;
+    public Time StartTime;
+    public Time EndTime;
+    public BreakTime breakTimeInMinutes;
 
-    public String getId() {
-        return Id;
+    public Config() {
+        this.WorkDays = new HashSet<>();
+
+        final Calendar c = Calendar.getInstance();
+        int mHour = c.get(Calendar.HOUR_OF_DAY);
+        int mMinute = c.get(Calendar.MINUTE);
+        this.StartTime = new Time(mHour, mMinute);
+        this.EndTime = this.StartTime;
+        this.breakTimeInMinutes = new BreakTime(30, "min");
     }
 
-    public void setId(String id) {
-        Id = id;
+    public void setWeekDays(MaterialDayPicker.Weekday day, boolean selected) {
+        if (this.WorkDays.contains(day)) {
+            if (! selected) {
+                this.WorkDays.remove(day);
+            }
+        }
+        else{
+            if (selected) {
+                this.WorkDays.add(day);
+            }
+        }
     }
 
-    public String getEmail() {
-        return Email;
-    }
-
-    public void setEmail(String email) {
-        Email = email;
-    }
-
-    public String getName() {
-        return Name;
-    }
-
-    public void setName(String name) {
-        Name = name;
-    }
-
-    public String[] getWorkDays() {
-        return WorkDays;
-    }
-
-    public void setWorkDays(String[] workDays) {
-        WorkDays = workDays;
-    }
-
-    public String getStartTime() {
-        return StartTime;
-    }
-
-    public void setStartTime(String startTime) {
-        StartTime = startTime;
-    }
-
-    public String getEndTime() {
-        return EndTime;
-    }
-
-    public void setEndTime(String endTime) {
-        EndTime = endTime;
-    }
-
-    public int getBreakTimeInMinutes() {
-        return breakTimeInMinutes;
-    }
-
-    public void setBreakTimeInMinutes(int breakTimeInMinutes) {
-        this.breakTimeInMinutes = breakTimeInMinutes;
+    @Override
+    public String toString() {
+        return "Config{" +
+                "Id='" + Id + '\'' +
+                ", Email='" + Email + '\'' +
+                ", Name='" + Name + '\'' +
+                ", WorkDays=" + WorkDays +
+                ", StartTime=" + StartTime.toString() +
+                ", EndTime=" + EndTime.toString() +
+                ", breakTimeInMinutes=" + breakTimeInMinutes.toString() +
+                '}';
     }
 }
