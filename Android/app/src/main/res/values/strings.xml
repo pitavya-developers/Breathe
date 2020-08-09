@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Breathe</string>
-        <string name="greeting_good_morning">Good Morning</string>
+    <string name="greeting_good_morning">Good Morning</string>
     <string name="greeting_good_afternoon">Good Afternoon</string>
     <string name="greeting_good_evening">Good Evening</string>
 
@@ -9,4 +9,10 @@
     <string name="message_i_work_on">I work on</string>
     <string name="message_between">Between</string>
     <string name="message_remind_break">Remind me for break every</string>
+
+    <string name="dialog_autostart_info">AutoStart permission is needed for appp to work correctly</string>
+    <string name="title_activity_break_splash">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>
