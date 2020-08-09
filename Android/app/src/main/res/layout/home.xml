@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/greeting_good_morning"
-
+        android:text="@string/greeting_hii"
+        android:textSize="24sp"
         />
 
     <!--    Guest / Name -->
@@ -22,26 +22,44 @@
         android:id="@+id/home_greeting_to"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="36dp"
         android:gravity="center"
         android:text="@string/greeting_to_guest"
+        android:textSize="18sp"
 
         />
 
     <!--    radio button for enable/disable -->
-    <Switch
-        android:onClick="activate_breathe"
-        android:gravity="right"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="Activate Break"
+            android:textSize="24sp"></TextView>
+
+        <Switch
+            android:id="@+id/home_activate_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="right"
+            android:onClick="activate_breathe" />
+
+    </LinearLayout>
 
     <!--  I Work on  -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/message_i_work_on"
-        android:layout_marginTop="16dp"
-
-        />
+        android:textSize="24dp" />
 
 
     <!--    week day picker -->
@@ -52,10 +70,14 @@
 
     <!--    Between -->
     <TextView
-        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/message_between" />
+        android:layout_marginTop="36dp"
+        android:text="@string/message_between"
+        android:textSize="24dp"
+        android:layout_marginBottom="12dp"
+
+        />
 
 
     <LinearLayout
@@ -68,40 +90,45 @@
             android:id="@+id/home_work_start_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9 AM"
             android:onClick="showTimePicker"
-            />
+            android:text="9 AM"
+            android:textSize="20sp" />
 
         <!--   - -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
 
-            android:text="and" />
+            android:layout_marginRight="16dp"
+            android:text="and"
+
+            android:textSize="20sp" />
         <!--    end time picker-->
         <TextView
             android:id="@+id/home_work_end_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5 PM"
             android:onClick="showTimePicker"
-            />
+            android:text="6 PM"
+            android:textSize="20sp" />
     </LinearLayout>
 
 
     <!--    Remind me for Breathe every -->
     <TextView
-        android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/message_remind_break" />
+        android:layout_marginTop="36dp"
+        android:text="@string/message_remind_break"
+        android:textSize="24dp"
+        android:layout_marginBottom="12dp"
+
+        />
 
     <!--    spinner for selecting time (30min, 45min, 60 min, 90min, 120min) -->
-   <Spinner
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/home_break_time_gap"
-       ></Spinner>
+    <Spinner
+        android:id="@+id/home_break_time_gap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></Spinner>
 </LinearLayout>

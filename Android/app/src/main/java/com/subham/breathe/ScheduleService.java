@@ -2,6 +2,7 @@ package com.subham.breathe;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
@@ -16,8 +17,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+
+import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 public class ScheduleService extends JobService {
 
@@ -37,21 +41,50 @@ public class ScheduleService extends JobService {
     }
 
     private void doInBackground(final JobParameters params) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (stopped) return;
-                Log.d(TAG, "job in progress");
-                showNotification();
-                Log.d(TAG, "job finished");
-            }
-
+        new Thread(() -> {
+            if (stopped) return;
+            Log.d(TAG, "job in progress");
+            showNotification();
+            Log.d(TAG, "job finished");
         }).start();
         jobFinished(params, false);
     }
 
+    private boolean satisfyBreakCriteria() {
+
+        ConfigPersistanceStorage configPersistanceStorage = new ConfigPersistanceStorage(getApplicationContext());
+
+        if(configPersistanceStorage.getFirstTimeActivated()) {
+            return false;
+        }
+
+        final Calendar c = Calendar.getInstance();
+        int mHour = c.get(Calendar.HOUR_OF_DAY);
+        int mMinute = c.get(Calendar.MINUTE);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - 1; // weekday starts with 0 and calender with 1
+
+        Time currentTime = new Time(mHour, mMinute);
+        Time startTime = configPersistanceStorage.getStartTime();
+        Time   endTime = configPersistanceStorage.getEndTime();
+
+        if (configPersistanceStorage.getWeekDays().indexOf(MaterialDayPicker.Weekday.values()[dayOfWeek]) != -1) {
+            return currentTime.compare(currentTime, startTime) > -1
+                    && currentTime.compare(currentTime, endTime) < 1;
+        }
+
+        return false;
+    }
+
     private void showNotification() {
+        if (! satisfyBreakCriteria()) {
+            return;
+        }
+        Intent intent = new Intent(getApplicationContext(), BreakSplash.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+
+
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),
                 "7979")
                 .setSmallIcon(R.drawable.circle_toggle_button)
@@ -59,12 +92,13 @@ public class ScheduleService extends JobService {
                 .setContentText("Take Break")
                 .setPriority(NotificationCompat.FLAG_NO_CLEAR)
                 // Set the intent that will fire when the user taps the notification
-//                .setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
         createNotificationChannel(getApplicationContext());
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         notificationManager.notify(getTimeSeconds(), builder.build());
 
+        new MusicPlayer().play(getApplicationContext(), R.raw.pristine);
     }
 
     private static int getTimeSeconds() {
@@ -110,7 +144,6 @@ public class ScheduleService extends JobService {
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-        context.startActivity(new Intent(context, BreakSplash.class));
     }
 
     @Override

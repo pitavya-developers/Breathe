@@ -1,53 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="@color/healthy_green"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".BreakSplash">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
     <TextView
-        android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
+        android:text="@string/greeting_break_time"
+        android:textColor="@color/healthy_green_text"
+        android:textSize="32dp"
         android:textStyle="bold" />
 
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-    <FrameLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        app:cardBackgroundColor="#ffffff"
+        app:cardCornerRadius="4dp"
+
+        >
 
         <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
+            android:orientation="vertical">
 
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animatedExercise"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/breathinginandout" />
 
-            <Button
-                android:id="@+id/dummy_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dummy_button" />
-
+                android:id="@+id/exerciseMessage"
+                android:textColor="@color/healthy_green"
+                android:text="Roll Eyes"
+                android:padding="8dp"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:background="#f9f9f9"
+                android:textStyle="bold"
+                ></TextView>
         </LinearLayout>
-    </FrameLayout>
 
-</FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:textAllCaps="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/healthy_green_dark"
+        android:onClick="endBreak"
+        android:text="@string/notification_break_end_break"
+        android:textColor="@color/healthy_green_text" />
+</LinearLayout>

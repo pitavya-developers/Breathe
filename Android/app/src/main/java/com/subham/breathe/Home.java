@@ -20,12 +20,16 @@ import android.widget.TextView;
 
 import com.judemanutd.autostarter.AutoStartPermissionHelper;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
+
 import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    Config config;
+    static Config config;
+    ConfigPersistanceStorage configPersistanceStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,17 +39,47 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
 
     private void init() {
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        configPersistanceStorage = new ConfigPersistanceStorage(this);
+
+        InitializeConfigParameters();
+
         dayChangeChooser();
         setupBreakTimeSpinner();
-        SetCredentialsFromGoogleSignIn();
         manageAutoPermission();
     }
 
-    private void SetCredentialsFromGoogleSignIn() {
+    private void InitializeConfigParameters() {
         config = new Config();
+        // TODO Faiz setup from google sign in
         config.Id = "1";
-        config.Name = "Subham";
-        config.Email = "subhamkumarchandrawansi@gmail.com";
+        config.Name = "Guest";
+        config.Email = "guest@xyz";
+        // TODO End Faiz setup from google sign in
+
+        config.activated = configPersistanceStorage.getActivated();
+        config.WorkDays = new ArrayList<>();
+
+        if (config.activated) {
+            config.WorkDays = configPersistanceStorage.getWeekDays();
+            config.StartTime = configPersistanceStorage.getStartTime();
+            config.EndTime = configPersistanceStorage.getEndTime();
+            config.breakTimeInMinutes = configPersistanceStorage.getBreakTime();
+
+        }
+        else{
+            config.WorkDays.add(MaterialDayPicker.Weekday.MONDAY);
+            config.WorkDays.add(MaterialDayPicker.Weekday.TUESDAY);
+            config.WorkDays.add(MaterialDayPicker.Weekday.WEDNESDAY);
+            config.WorkDays.add(MaterialDayPicker.Weekday.THURSDAY);
+            config.WorkDays.add(MaterialDayPicker.Weekday.FRIDAY);
+
+        }
+
+        ((MaterialDayPicker) findViewById(R.id.day_picker)).setSelectedDays(config.WorkDays);
+        ((TextView) findViewById(R.id.home_work_start_time)).setText(config.EndTime.toString());
+        ((TextView) findViewById(R.id.home_work_start_time)).setText(config.StartTime.toString());
+        ((Switch) findViewById(R.id.home_activate_switch)).setChecked(config.activated);
     }
 
 
@@ -59,7 +93,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         }
     }
 
-    static boolean permissionGiven;
     public static class AutoStartPermissionDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -71,7 +104,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                                 .getInstance().isAutoStartPermissionAvailable(getContext());
 
                         if (autoStartFeatureAvailable) {
-                            permissionGiven = AutoStartPermissionHelper
+                            config.permissionGiven = AutoStartPermissionHelper
                                     .getInstance().getAutoStartPermission(getContext());
 
                         }
@@ -82,8 +115,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             return builder.create();
         }
     }
-
-
     // end of autostart permission
 
 
@@ -93,12 +124,17 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     public void activate_breathe(View V) {
 
         if (((Switch)V).isChecked()){
+            config.activated = true;
+            config.firstTimeActivated = true;
+            configPersistanceStorage.update(config);
             startBreakService();
         }
         else{
+            config.activated = false;
+            config.firstTimeActivated = false;
+            configPersistanceStorage.update(config);
             stopBreakService();
         }
-
     }
 
     private void stopBreakService() {
@@ -109,19 +145,11 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     private void startBreakService() {
         ComponentName serviceComponent = new ComponentName(this, ScheduleService.class);
-
+        int breakTime = config.breakTimeInMinutes.time * 60 * 1000;
         JobInfo jobInfo
                 = new JobInfo.Builder(7979, serviceComponent)
-//                .setMinimumLatency(1 * 1000)
-//                .setOverrideDeadline(3 * 1000)
-//                TODO uncomment me
-                .setPeriodic(config.breakTimeInMinutes.time * 60 * 1000)
-//                .setPeriodic(15 * 60 * 1000)
-//                .setMinimumLatency(5000)
+                .setPeriodic(breakTime)
                 .setPersisted(true).build();
-        //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
-        //builder.setRequiresDeviceIdle(true); // device should be idle
-        //builder.setRequiresCharging(false); // we don't care if the device is charging or not
         JobScheduler jobScheduler = (JobScheduler) this.getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = jobScheduler.schedule(jobInfo);
 
@@ -134,10 +162,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     }
 
-
-
     public void showTimePicker(final View V) {
-
 
         final Calendar c = Calendar.getInstance();
         int mHour = c.get(Calendar.HOUR_OF_DAY);
@@ -150,9 +175,13 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
                     if (V.getId() == R.id.home_work_start_time){
                         config.StartTime = time;
+                        configPersistanceStorage.update(config);
+
                     }
                     else{
                         config.EndTime = new Time(hourOfDay, minute);
+                        configPersistanceStorage.update(config);
+
                     }
                 }, mHour, mMinute, false);
         timePickerDialog.show();
@@ -161,7 +190,10 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     public void dayChangeChooser() {
         ((MaterialDayPicker) findViewById(R.id.day_picker))
-                .setDayPressedListener((weekday, b) -> config.setWeekDays(weekday, b));
+                .setDayPressedListener((weekday, b) -> {
+                    config.setWeekDays(weekday, b);
+                    configPersistanceStorage.update(config);
+                });
     }
 
     // frequency spinner
@@ -173,12 +205,16 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 android.R.layout.simple_spinner_item, BreakTime.getDefaultBreakTimes());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         breakTimeSpinner.setAdapter(dataAdapter);
+
+        int selectedIndex = dataAdapter.getPosition(config.breakTimeInMinutes.toString());
+        breakTimeSpinner.setSelection(selectedIndex);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String item = parent.getItemAtPosition(position).toString();
         config.breakTimeInMinutes = new BreakTime(item);
+        configPersistanceStorage.update(config);
     }
 
     @Override

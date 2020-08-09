@@ -3,6 +3,8 @@
     <string name="greeting_good_morning">Good Morning</string>
     <string name="greeting_good_afternoon">Good Afternoon</string>
     <string name="greeting_good_evening">Good Evening</string>
+    <string name="greeting_hii">Hello There</string>
+    <string name="greeting_break_time">Break Time</string>
 
     <string name="greeting_to_guest">Guest</string>
 
@@ -14,5 +16,9 @@
     <string name="title_activity_break_splash">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="notification_break_default">Take Break</string>
+
+    <string name="notification_break_end_break">End Break</string>
 
 </resources>
