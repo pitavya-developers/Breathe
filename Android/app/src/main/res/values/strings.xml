@@ -6,6 +6,9 @@
     <string name="greeting_hii">Hello There</string>
     <string name="greeting_break_time">Break Time</string>
 
+    <string name="signin_message_intro1">Take Breaks During Work</string>
+    <string name="signin_message_intro2">Do simple exercises to be active</string>
+
     <string name="greeting_to_guest">Guest</string>
 
     <string name="message_i_work_on">I work on</string>
@@ -18,7 +21,12 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="notification_break_default">Take Break</string>
-
     <string name="notification_break_end_break">End Break</string>
+    <string name="notification_notification_desc">Your new break activity is ready</string>
+    <string name="notification_notification_name">Break Time</string>
+    <string name="notification_channel_id">Break Time</string>
+    <string name="loading_creating_acount">Creating Acount...</string>
+    <string name="signin_url">https://api-breathe.herokuapp.com/breathe/api/signin</string>
+
 
 </resources>

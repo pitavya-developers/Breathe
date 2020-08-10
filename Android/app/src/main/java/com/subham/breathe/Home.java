@@ -51,11 +51,10 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     private void InitializeConfigParameters() {
         config = new Config();
-        // TODO Faiz setup from google sign in
-        config.Id = "1";
-        config.Name = "Guest";
-        config.Email = "guest@xyz";
-        // TODO End Faiz setup from google sign in
+
+        config.Id = configPersistanceStorage.getGId();
+        config.Name = configPersistanceStorage.getGName();
+        config.Email = configPersistanceStorage.getGEmail();
 
         config.activated = configPersistanceStorage.getActivated();
         config.WorkDays = new ArrayList<>();
@@ -80,6 +79,8 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         ((TextView) findViewById(R.id.home_work_start_time)).setText(config.EndTime.toString());
         ((TextView) findViewById(R.id.home_work_start_time)).setText(config.StartTime.toString());
         ((Switch) findViewById(R.id.home_activate_switch)).setChecked(config.activated);
+        ((TextView) findViewById(R.id.home_greeting_to)).setText(config.Name);
+
     }
 
 

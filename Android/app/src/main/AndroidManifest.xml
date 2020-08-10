@@ -3,25 +3,28 @@
     package="com.subham.breathe">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_group_1"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_group_1"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".BreakSplash"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_break_splash"
-            android:theme="@style/FullscreenTheme"></activity>
-        <activity android:name=".Home">
+        <activity android:name=".SignIn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".BreakSplash"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_break_splash"
+            android:theme="@style/FullscreenTheme" />
+        <activity android:name=".Home">
         </activity>
 
         <service

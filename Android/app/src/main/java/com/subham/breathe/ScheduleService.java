@@ -86,12 +86,11 @@ public class ScheduleService extends JobService {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),
-                "7979")
-                .setSmallIcon(R.drawable.circle_toggle_button)
-                .setContentTitle("Breathe")
-                .setContentText("Take Break")
+                getString(R.string.notification_channel_id))
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(getString(R.string.notification_notification_name))
+                .setContentText(getString(R.string.notification_notification_desc))
                 .setPriority(NotificationCompat.FLAG_NO_CLEAR)
-                // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
         createNotificationChannel(getApplicationContext());
@@ -134,13 +133,11 @@ public class ScheduleService extends JobService {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Breathe";
-            String description = "Take Break";
+            CharSequence name = "Break Time";
+            String description = "Your new break activity is ready";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("7979", name, importance);
+            NotificationChannel channel = new NotificationChannel("Break Time", name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

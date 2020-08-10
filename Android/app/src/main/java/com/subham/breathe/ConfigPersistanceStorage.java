@@ -22,6 +22,9 @@ public class ConfigPersistanceStorage {
     private static String endTime = "endTime";
     private static String breakTime = "breakTime";
     private static String firstTimeActivated = "firstTimeActivated";
+    private static String name = "name";
+    private static String email = "email";
+    private static String token = "token";
 
 
     public ConfigPersistanceStorage(Context ctx) {
@@ -30,7 +33,7 @@ public class ConfigPersistanceStorage {
     }
 
     private void delete() {
-        this.preferencesEditor.clear();
+//        this.preferencesEditor.clear();
     }
 
     public void update(Config config) {
@@ -41,6 +44,35 @@ public class ConfigPersistanceStorage {
     public boolean getActivated() {
         return this.mPreferences.getBoolean(activated, false);
     }
+
+    public void setGName(String _name) {
+        preferencesEditor.putString(name, _name);
+        preferencesEditor.apply();
+    }
+
+    public void setGEmail(String _email) {
+        preferencesEditor.putString(email, _email);
+        preferencesEditor.apply();
+    }
+
+    public String getGName() {
+        return this.mPreferences.getString(name, "");
+    }
+
+    public String getGEmail() {
+        return this.mPreferences.getString(email, "");
+    }
+
+    public void setGId(String _token) {
+        preferencesEditor.putString(token, _token);
+        preferencesEditor.apply();
+    }
+
+    public String getGId() {
+        return this.mPreferences.getString(token, "");
+    }
+
+
 
     public boolean getFirstTimeActivated() {
         return this.mPreferences.getBoolean(firstTimeActivated, false);
