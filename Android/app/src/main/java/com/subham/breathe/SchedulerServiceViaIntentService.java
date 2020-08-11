@@ -1,16 +1,19 @@
 package com.subham.breathe;
 
+import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobParameters;
-import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -21,37 +24,40 @@ import java.util.Random;
 
 import ca.antonious.materialdaypicker.MaterialDayPicker;
 
-public class ScheduleService extends JobService {
+public class SchedulerServiceViaIntentService extends IntentService {
+    private static final String TAG = "ServiceViaIntent";
 
-    private static final String TAG = "JobService";
-    private  boolean stopped;
+    /**
+     * @param name
+     * @deprecated
+     */
+    public SchedulerServiceViaIntentService(String name) {
+        super(name);
+    }
+
 
     @Override
-    public boolean onStartJob(JobParameters jobParameters) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "service started");
-//        Intent service = new Intent(getApplicationContext(), SchedulerReceiver.class);
-        // TODO pass interval
-
-//        getApplicationContext().startService(service);
-//        BreakJob.scheduleJob(getApplicationContext(), 30); // reschedule the job
-        doInBackground(jobParameters);
-        return true;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+        doInBackground();
+        Log.d(TAG, "service completed");
 
     }
 
-    private void doInBackground(final JobParameters params) {
+//    @Override
+//    protected void onHandleWork(@NonNull Intent intent) {
+//        Log.d(TAG, "service started");
+//        doInBackground();
+//        Log.d(TAG, "service completed");
+//    }
+
+
+    private void doInBackground() {
         new Thread(() -> {
-            if (stopped) return;
             Log.d(TAG, "job in progress");
             showNotification();
             Log.d(TAG, "job finished");
         }).start();
-        jobFinished(params, false);
     }
 
     private boolean satisfyBreakCriteria() {
@@ -89,14 +95,16 @@ public class ScheduleService extends JobService {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 
+
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),
                 getString(R.string.notification_channel_id))
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(getString(R.string.notification_notification_name))
                 .setContentText(getString(R.string.notification_notification_desc))
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setAutoCancel(true)
-                .setFullScreenIntent(pendingIntent, true);
+                .setPriority(NotificationCompat.FLAG_NO_CLEAR)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
         createNotificationChannel(getApplicationContext());
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         notificationManager.notify(getTimeSeconds(), builder.build());
@@ -147,10 +155,4 @@ public class ScheduleService extends JobService {
         }
     }
 
-    @Override
-    public boolean onStopJob(JobParameters jobParameters) {
-        Log.d(TAG, "job cancelled before completion");
-        stopped = true;
-        return false;
-    }
 }

@@ -4,12 +4,17 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -118,6 +123,26 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
     // end of autostart permission
 
+    private void toogleService(boolean activate) {
+
+        if (activate) {
+            Intent intent = new Intent(getApplicationContext(), SchedulerServiceViaIntentService.class);
+            final PendingIntent pIntent = PendingIntent.getBroadcast(this, SchedulerReceiverForAlarmService.REQUEST_CODE,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            long firstMillis = System.currentTimeMillis();
+            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                    60 * 1000, pIntent);
+        }
+        else{
+            Intent intent = new Intent(getApplicationContext(), SchedulerServiceViaIntentService.class);
+            final PendingIntent pIntent = PendingIntent.getBroadcast(this, SchedulerReceiverForAlarmService.REQUEST_CODE,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarm.cancel(pIntent);
+        }
+    }
+
 
     private static final String TAG = "Home";
 
@@ -129,12 +154,14 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             config.firstTimeActivated = true;
             configPersistanceStorage.update(config);
             startBreakService();
+//            toogleService(true);
         }
         else{
             config.activated = false;
             config.firstTimeActivated = false;
             configPersistanceStorage.update(config);
             stopBreakService();
+//            toogleService(false);
         }
     }
 
@@ -187,7 +214,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 }, mHour, mMinute, false);
         timePickerDialog.show();
     }
-
 
     public void dayChangeChooser() {
         ((MaterialDayPicker) findViewById(R.id.day_picker))
