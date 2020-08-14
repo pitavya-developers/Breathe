@@ -92,7 +92,7 @@ public class ConfigPersistanceStorage {
             return result;
         }
         else{
-            return null;
+            return result;
         }
     }
 

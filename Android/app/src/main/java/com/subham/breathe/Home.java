@@ -82,7 +82,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             config.StartTime = configPersistanceStorage.getStartTime();
             config.EndTime = configPersistanceStorage.getEndTime();
             config.breakTimeInMinutes = configPersistanceStorage.getBreakTime();
-
         } else {
             config.WorkDays.add(MaterialDayPicker.Weekday.MONDAY);
             config.WorkDays.add(MaterialDayPicker.Weekday.TUESDAY);
@@ -170,7 +169,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
          *  This is method responsible for the following
          * 1.  hit the broadcast service at the interval provided by the user */
 
-        long interval = Long.parseLong(String.valueOf(binding.homeBreakTimeGap.getSelectedItem())) * 60 * 1000;
+        long interval = config.breakTimeInMinutes.time * 60 * 1000;
 
         // How ever it has been set for 10 sec , but internally it will be of minimum of 60 seconds ad per android ..
         manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);

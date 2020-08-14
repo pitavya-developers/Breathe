@@ -26,6 +26,7 @@ public class BreakTime {
 
     public static ArrayList<String> getDefaultBreakTimes(){
         ArrayList<String> categories = new ArrayList<String>();
+        categories.add(new BreakTime(1, "min").toString());
         categories.add(new BreakTime(30, "min").toString());
         categories.add(new BreakTime(45, "min").toString());
         categories.add(new BreakTime(60, "min").toString());
