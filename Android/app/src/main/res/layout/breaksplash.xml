@@ -44,27 +44,26 @@
                 app:lottie_rawRes="@raw/breathinginandout" />
 
             <TextView
+                android:id="@+id/exerciseMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/exerciseMessage"
-                android:textColor="@color/healthy_green"
-                android:text="Roll Eyes"
-                android:padding="8dp"
-                android:gravity="center"
-                android:textSize="18sp"
                 android:background="#f9f9f9"
-                android:textStyle="bold"
-                ></TextView>
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Roll Eyes"
+                android:textColor="@color/healthy_green"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/healthy_green_dark"
         android:onClick="endBreak"
         android:text="@string/notification_break_end_break"
+        android:textAllCaps="false"
         android:textColor="@color/healthy_green_text" />
 </LinearLayout>

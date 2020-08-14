@@ -130,5 +130,5 @@
     <Spinner
         android:id="@+id/home_break_time_gap"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"></Spinner>
+        android:layout_height="wrap_content"/>
 </LinearLayout>

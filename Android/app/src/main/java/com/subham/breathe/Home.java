@@ -1,9 +1,6 @@
 package com.subham.breathe;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -22,8 +19,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import com.judemanutd.autostarter.AutoStartPermissionHelper;
+import com.subham.breathe.databinding.HomeBinding;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,12 +36,20 @@ import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private static final String TAG = "Home";
     static Config config;
     ConfigPersistanceStorage configPersistanceStorage;
+    private PendingIntent pendingIntent;
+    private AlarmManager manager;
+    private HomeBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        binding = HomeBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         setContentView(R.layout.home);
         init();
     }
@@ -52,6 +63,8 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         dayChangeChooser();
         setupBreakTimeSpinner();
         manageAutoPermission();
+
+
     }
 
     private void InitializeConfigParameters() {
@@ -70,8 +83,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
             config.EndTime = configPersistanceStorage.getEndTime();
             config.breakTimeInMinutes = configPersistanceStorage.getBreakTime();
 
-        }
-        else{
+        } else {
             config.WorkDays.add(MaterialDayPicker.Weekday.MONDAY);
             config.WorkDays.add(MaterialDayPicker.Weekday.TUESDAY);
             config.WorkDays.add(MaterialDayPicker.Weekday.WEDNESDAY);
@@ -88,7 +100,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     }
 
-
     // Auto Start permission
     private void manageAutoPermission() {
         boolean autoStartFeatureAvailable = AutoStartPermissionHelper
@@ -96,29 +107,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
         if (autoStartFeatureAvailable) {
             new AutoStartPermissionDialog().show(getSupportFragmentManager(), "AUTOSTART");
-        }
-    }
-
-    public static class AutoStartPermissionDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(R.string.dialog_autostart_info)
-                    .setPositiveButton("Grant", (dialog, id) -> {
-
-                        boolean autoStartFeatureAvailable = AutoStartPermissionHelper
-                                .getInstance().isAutoStartPermissionAvailable(getContext());
-
-                        if (autoStartFeatureAvailable) {
-                            config.permissionGiven = AutoStartPermissionHelper
-                                    .getInstance().getAutoStartPermission(getContext());
-
-                        }
-                    })
-                    .setNegativeButton("Cancel", (dialog, id) -> {
-                        dialog.dismiss();
-                    });
-            return builder.create();
         }
     }
     // end of autostart permission
@@ -144,24 +132,59 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
 
 
-    private static final String TAG = "Home";
-
     // TODO start service from config
     public void activate_breathe(View V) {
 
-        if (((Switch)V).isChecked()){
+        if (((Switch) V).isChecked()) {
             config.activated = true;
             config.firstTimeActivated = true;
             configPersistanceStorage.update(config);
-            startBreakService();
-//            toogleService(true);
-        }
-        else{
+            //startBreakService();
+            // setting up alarm service
+            setupRequestResponseForInstantVerification();
+        } else {
             config.activated = false;
             config.firstTimeActivated = false;
             configPersistanceStorage.update(config);
-            stopBreakService();
-//            toogleService(false);
+            //stopBreakService();
+            stopRequestResponseForInstantVerification();
+        }
+    }
+
+
+    private void setupRequestResponseForInstantVerification() {
+        // Setup a PendingIntent that will perform a broadcast
+        Log.e("customService", ": ------------------------------------------------------------   :request is being setup");
+
+        Intent alarmIntent = new Intent(this, AlarmServiceReciever.class);
+        //alarmIntent.putExtra("anyString", "anyString");
+
+        pendingIntent = PendingIntent.getBroadcast(this, 100, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        startRequestResponseForInstantVerification();
+    }
+
+    private void startRequestResponseForInstantVerification() {
+        /*
+         *  This is method responsible for the following
+         * 1.  hit the broadcast service at the interval provided by the user */
+
+        long interval = Long.parseLong(String.valueOf(binding.homeBreakTimeGap.getSelectedItem())) * 60 * 1000;
+
+        // How ever it has been set for 10 sec , but internally it will be of minimum of 60 seconds ad per android ..
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
+        Toast.makeText(this, "Request Initiated", Toast.LENGTH_SHORT).show();
+        Log.e("alarmService : ", "-------------------------------------Started--------------------------------------------");
+
+    }
+
+    private void stopRequestResponseForInstantVerification() {
+        /*  This method goes off when user logs out */
+        if (manager != null) {
+            manager.cancel(pendingIntent);
+            //  Toast.makeText(this, "Request Canceled", Toast.LENGTH_SHORT).show();
+            Log.e("alarmService : ", "-------------------------------------Stopped--------------------------------------------");
         }
     }
 
@@ -171,6 +194,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         Log.d(TAG, "job cancelled");
     }
 
+    @SuppressLint("MissingPermission")
     private void startBreakService() {
         ComponentName serviceComponent = new ComponentName(this, ScheduleService.class);
         int breakTime = config.breakTimeInMinutes.time * 60 * 1000;
@@ -183,8 +207,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
             Log.d(TAG, "job scheduled");
-        }
-        else{
+        } else {
             Log.d(TAG, "job scheduled failed");
         }
 
@@ -199,14 +222,13 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 (view, hourOfDay, minute) -> {
                     Time time = new Time(hourOfDay, minute);
-                    ((TextView)V).setText(time.toString());
+                    ((TextView) V).setText(time.toString());
 
-                    if (V.getId() == R.id.home_work_start_time){
+                    if (V.getId() == R.id.home_work_start_time) {
                         config.StartTime = time;
                         configPersistanceStorage.update(config);
 
-                    }
-                    else{
+                    } else {
                         config.EndTime = new Time(hourOfDay, minute);
                         configPersistanceStorage.update(config);
 
@@ -225,7 +247,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     // frequency spinner
     private void setupBreakTimeSpinner() {
-        Spinner breakTimeSpinner = (Spinner) findViewById(R.id.home_break_time_gap);
+        Spinner breakTimeSpinner = findViewById(R.id.home_break_time_gap);
         (breakTimeSpinner).setOnItemSelectedListener(Home.this);
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
@@ -247,5 +269,28 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    public static class AutoStartPermissionDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(R.string.dialog_autostart_info)
+                    .setPositiveButton("Grant", (dialog, id) -> {
+
+                        boolean autoStartFeatureAvailable = AutoStartPermissionHelper
+                                .getInstance().isAutoStartPermissionAvailable(getContext());
+
+                        if (autoStartFeatureAvailable) {
+                            config.permissionGiven = AutoStartPermissionHelper
+                                    .getInstance().getAutoStartPermission(getContext());
+
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, id) -> {
+                        dialog.dismiss();
+                    });
+            return builder.create();
+        }
     }
 }

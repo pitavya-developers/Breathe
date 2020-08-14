@@ -20,13 +20,15 @@ public class BreakJob {
     public static void scheduleJob(Context context, int time) {
         ComponentName serviceComponent = new ComponentName(context, ScheduleService.class);
 
+        int breakTime = new ConfigPersistanceStorage(context).getBreakTime().time * 60 * 1000;
+
         JobInfo jobInfo
                 = new JobInfo.Builder(7979, serviceComponent)
 //                .setMinimumLatency(1 * 1000)
 //                .setOverrideDeadline(3 * 1000)
 //                TODO uncomment me
 //                .setPeriodic(config.breakTimeInMinutes.time * 1000)
-                .setPeriodic(15 * 60 * 1000)
+                .setPeriodic(breakTime * 60 * 1000)
 //                .setMinimumLatency(5000)
                 .setPersisted(true).build();
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
