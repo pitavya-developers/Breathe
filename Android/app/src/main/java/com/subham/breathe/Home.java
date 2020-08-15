@@ -1,17 +1,13 @@
 package com.subham.breathe;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
@@ -110,26 +107,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
     // end of autostart permission
 
-    private void toogleService(boolean activate) {
-
-        if (activate) {
-            Intent intent = new Intent(getApplicationContext(), SchedulerServiceViaIntentService.class);
-            final PendingIntent pIntent = PendingIntent.getBroadcast(this, SchedulerReceiverForAlarmService.REQUEST_CODE,
-                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            long firstMillis = System.currentTimeMillis();
-            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-            alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
-                    60 * 1000, pIntent);
-        }
-        else{
-            Intent intent = new Intent(getApplicationContext(), SchedulerServiceViaIntentService.class);
-            final PendingIntent pIntent = PendingIntent.getBroadcast(this, SchedulerReceiverForAlarmService.REQUEST_CODE,
-                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-            alarm.cancel(pIntent);
-        }
-    }
-
 
     // TODO start service from config
     public void activate_breathe(View V) {
@@ -193,24 +170,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         Log.d(TAG, "job cancelled");
     }
 
-    @SuppressLint("MissingPermission")
-    private void startBreakService() {
-        ComponentName serviceComponent = new ComponentName(this, ScheduleService.class);
-        int breakTime = config.breakTimeInMinutes.time * 60 * 1000;
-        JobInfo jobInfo
-                = new JobInfo.Builder(7979, serviceComponent)
-                .setPeriodic(breakTime)
-                .setPersisted(true).build();
-        JobScheduler jobScheduler = (JobScheduler) this.getSystemService(JOB_SCHEDULER_SERVICE);
-        int resultCode = jobScheduler.schedule(jobInfo);
-
-        if (resultCode == JobScheduler.RESULT_SUCCESS) {
-            Log.d(TAG, "job scheduled");
-        } else {
-            Log.d(TAG, "job scheduled failed");
-        }
-
-    }
 
     public void showTimePicker(final View V) {
 
@@ -249,7 +208,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         Spinner breakTimeSpinner = findViewById(R.id.home_break_time_gap);
         (breakTimeSpinner).setOnItemSelectedListener(Home.this);
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, BreakTime.getDefaultBreakTimes());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         breakTimeSpinner.setAdapter(dataAdapter);
@@ -271,14 +230,15 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
 
     public static class AutoStartPermissionDialog extends DialogFragment {
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
             builder.setMessage(R.string.dialog_autostart_info)
                     .setPositiveButton("Grant", (dialog, id) -> {
 
                         boolean autoStartFeatureAvailable = AutoStartPermissionHelper
-                                .getInstance().isAutoStartPermissionAvailable(getContext());
+                                .getInstance().isAutoStartPermissionAvailable(Objects.requireNonNull(getContext()));
 
                         if (autoStartFeatureAvailable) {
                             config.permissionGiven = AutoStartPermissionHelper
@@ -286,9 +246,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
                         }
                     })
-                    .setNegativeButton("Cancel", (dialog, id) -> {
-                        dialog.dismiss();
-                    });
+                    .setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss());
             return builder.create();
         }
     }

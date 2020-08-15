@@ -25,8 +25,9 @@
     <string name="notification_notification_desc">Your new break activity is ready</string>
     <string name="notification_notification_name">Break Time</string>
     <string name="notification_channel_id">Break Time</string>
-    <string name="loading_creating_acount">Creating Acount...</string>
+    <string name="loading_creating_acount">Creating Acount…</string>
     <string name="signin_url">https://api-breathe.herokuapp.com/breathe/api/signin</string>
+    <string name="roll_eyes">Roll Eyes</string>
 
 
 </resources>

@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/healthy_green"
+    android:layout_gravity="center_vertical"
     android:orientation="vertical"
     android:padding="16dp"
+    android:background="#ffffff"
     tools:context=".BreakSplash">
 
     <TextView
@@ -14,11 +15,11 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/greeting_break_time"
-        android:textColor="@color/healthy_green_text"
-        android:textSize="32dp"
+        android:textSize="32sp"
         android:textStyle="bold" />
 
     <androidx.cardview.widget.CardView
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -50,7 +51,7 @@
                 android:background="#f9f9f9"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="Roll Eyes"
+                android:text="@string/roll_eyes"
                 android:textColor="@color/healthy_green"
                 android:textSize="18sp"
                 android:textStyle="bold" />
