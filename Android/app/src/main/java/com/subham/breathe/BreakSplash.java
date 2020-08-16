@@ -1,10 +1,11 @@
 package com.subham.breathe;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -20,13 +21,19 @@ public class BreakSplash extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+        int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+
+        getWindow().addFlags(flags);
+
         setContentView(R.layout.breaksplash);
         setRandowmImage();
     }
 
 
     private void setRandowmImage() {
-        ArrayList<Exercise> exercises = new ArrayList<Exercise>();
+        ArrayList<Exercise> exercises = new ArrayList<>();
         exercises.add(new Exercise(R.raw.healthyyogafox, "Just Relax and Sit"));
         exercises.add(new Exercise(R.raw.workoutmonkeystayhealthy, "Do some Workout"));
         exercises.add(new Exercise(R.raw.meditate, "Meditate For Now"));

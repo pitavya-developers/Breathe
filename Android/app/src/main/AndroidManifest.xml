@@ -8,13 +8,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+
         android:allowBackup="true"
         android:icon="@drawable/ic_group_1"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_group_1"
+
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignIn">
+        <activity
+            android:name=".SignIn"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,10 +29,16 @@
             android:name=".BreakSplash"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_break_splash"
+            android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".Home" />
+        <activity
+            android:name=".Home"
+            android:screenOrientation="portrait" />
 
-        <receiver android:name=".AlarmServiceReciever">
+
+        <receiver android:name=".AlarmServiceReciever" />
+
+        <receiver android:name=".RebootAlarmServiceReciever">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

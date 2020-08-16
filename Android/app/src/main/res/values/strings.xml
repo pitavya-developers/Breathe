@@ -28,6 +28,10 @@
     <string name="loading_creating_acount">Creating Acount…</string>
     <string name="signin_url">https://api-breathe.herokuapp.com/breathe/api/signin</string>
     <string name="roll_eyes">Roll Eyes</string>
+    <string name="activate_break">Activate Break</string>
+    <string name="_9_am">9 AM</string>
+    <string name="and">and</string>
+    <string name="_6_pm">6 PM</string>
 
 
 </resources>

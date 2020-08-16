@@ -1,16 +1,17 @@
 package com.subham.breathe;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.RingtoneManager;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -22,29 +23,20 @@ import java.util.Random;
 import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 public class AlarmServiceReciever extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // recieve any setting or anyData
-        //anyObject = intent.getExtras().context.getString("anyString");
-        Log.e("onReceive: ", "---------------------------------------------------------------");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                showNotification(context);
-            }
-        }).start();
 
+
+    private static Intent createBreakSplashIntent() {
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
+        intent.setClassName("com.subham.breathe", BreakSplash.class.getName());
+        return intent;
     }
 
     private boolean satisfyBreakCriteria(Context context) {
 
         ConfigPersistanceStorage configPersistanceStorage = new ConfigPersistanceStorage(context);
-
-        /*
-        if(configPersistanceStorage.getFirstTimeActivated()) {
-            return true;
-        }
-         */
 
         final Calendar c = Calendar.getInstance();
         int mHour = c.get(Calendar.HOUR_OF_DAY);
@@ -53,7 +45,7 @@ public class AlarmServiceReciever extends BroadcastReceiver {
 
         Time currentTime = new Time(mHour, mMinute);
         Time startTime = configPersistanceStorage.getStartTime();
-        Time   endTime = configPersistanceStorage.getEndTime();
+        Time endTime = configPersistanceStorage.getEndTime();
 
         if (configPersistanceStorage.getWeekDays().indexOf(MaterialDayPicker.Weekday.values()[dayOfWeek]) != -1) {
             return currentTime.compare(currentTime, startTime) > -1
@@ -63,13 +55,22 @@ public class AlarmServiceReciever extends BroadcastReceiver {
         return false;
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        new Thread(() -> {
+            showNotification(context);
+        }).start();
+    }
+
     private void showNotification(Context context) {
-//        if (! satisfyBreakCriteria()) {
-//            return;
-//        }
+        if (!satisfyBreakCriteria(context)) {
+            return;
+        }
         Intent intent = new Intent(context, BreakSplash.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                AlarmServiceReciever.createBreakSplashIntent(), 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
                 context.getString(R.string.notification_channel_id))
@@ -77,13 +78,23 @@ public class AlarmServiceReciever extends BroadcastReceiver {
                 .setContentTitle(context.getString(R.string.notification_notification_name))
                 .setContentText(context.getString(R.string.notification_notification_desc))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setOngoing(true)
                 .setAutoCancel(true)
+                .setCategory(Notification.CATEGORY_CALL)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .addAction(R.drawable.logo, "Reject", null)
+                .addAction(R.drawable.notification_icon, "Answer", null)
+                .setContentIntent(pendingIntent)
                 .setFullScreenIntent(pendingIntent, true);
+
+        builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE), AudioManager.STREAM_RING);
+        builder.setVibrate(new long[]{500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500});
+
         createNotificationChannel(context);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(getTimeSeconds(), builder.build());
+//        new MusicPlayer().play(context, R.raw.pristine);
 
-        new MusicPlayer().play(context, R.raw.pristine);
     }
 
     private static int getTimeSeconds() {
