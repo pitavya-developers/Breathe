@@ -15,21 +15,23 @@ class BreakService {
 
     BreakService(Context context) {
         this.context = context;
+        Intent alarmIntent = new Intent(this.context, AlarmServiceReciever.class);
+        this.pendingIntent = PendingIntent.getBroadcast(this.context, 100, alarmIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        this.manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
     }
 
     public void startBreakService(int breakTimeMinutes) {
-        Intent alarmIntent = new Intent(this.context, AlarmServiceReciever.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.context, 100, alarmIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         long interval = breakTimeMinutes * 60 * 1000;
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
+        this.manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval,
+                this.pendingIntent);
         Log.e(TAG, "service started " + breakTimeMinutes + "minutes");
     }
 
     public void stopBreakService() {
-        if (manager != null) {
-            manager.cancel(pendingIntent);
+        if (this.manager != null && this.pendingIntent != null) {
+            this.manager.cancel(this.pendingIntent);
             Log.e(TAG, "service stopped");
         }
     }

@@ -1,6 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\projects\\studio_keystore.jks')
+            storePassword 'ForAppDev1@'
+            keyAlias 'PlayStore1@'
+            keyPassword 'ForAppDist1@'
+        }
+        release {
+            storeFile file('C:\\projects\\studio_keystore.jks')
+            storePassword 'ForAppDev1@'
+            keyAlias 'PlayStore1@'
+            keyPassword 'ForAppDist1@'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
@@ -16,8 +30,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            multiDexEnabled true
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -47,8 +66,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation 'ca.antonious:materialdaypicker:0.7.2'
     implementation 'com.github.judemanutd:autostarter:1.0.8'
+    implementation 'com.github.DavidProdinger:weekdays-selector:1.1.1'
 
     def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"

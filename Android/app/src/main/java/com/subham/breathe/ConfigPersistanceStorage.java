@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 
-import ca.antonious.materialdaypicker.MaterialDayPicker;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class ConfigPersistanceStorage {
@@ -33,7 +31,7 @@ public class ConfigPersistanceStorage {
     }
 
     private void delete() {
-//        this.preferencesEditor.clear();
+        this.preferencesEditor.clear();
     }
 
     public void update(Config config) {
@@ -73,13 +71,12 @@ public class ConfigPersistanceStorage {
     }
 
 
-
     public boolean getFirstTimeActivated() {
         return this.mPreferences.getBoolean(firstTimeActivated, false);
     }
 
-    public ArrayList<MaterialDayPicker.Weekday> getWeekDays() {
-        ArrayList<MaterialDayPicker.Weekday> result = new ArrayList<>(7);
+    public ArrayList<Integer> getWeekDays() {
+        ArrayList<Integer> result = new ArrayList<>(7);
 
         String weekDaysString = this.mPreferences.getString(weekDays, "");
         if (weekDaysString.length() > 0) {
@@ -87,53 +84,86 @@ public class ConfigPersistanceStorage {
             String[] weekDaysArray = weekDaysString.split(",");
             for (String weekday :
                     weekDaysArray) {
-                result.add(MaterialDayPicker.Weekday.valueOf(weekday));
+                result.add(Integer.parseInt(weekday));
             }
             return result;
         }
-        else{
+        else {
+            result.add(0, 1);
+            result.add(1, 2);
+            result.add(2, 3);
+            result.add(3, 4);
+            result.add(4, 5);
             return result;
         }
     }
 
-    public Time getStartTime() {
-        return new Time(this.mPreferences.getString(startTime, ""));
-    }
-
-
-    public Time getEndTime() {
-        return new Time(this.mPreferences.getString(endTime, ""));
-    }
-
-    public BreakTime getBreakTime() {
-        return new BreakTime(this.mPreferences.getString(breakTime, ""));
-    }
-
-
-    public void save(Config config) {
-
-        this.preferencesEditor.putBoolean(activated, config.activated);
-
+    public void setWeekDays(Config config) {
         if (config.WorkDays.size() > 0) {
             String days = config.WorkDays.get(0).toString();
             for (int i = 1; i < config.WorkDays.size(); i++) {
                 days = days + "," + config.WorkDays.get(i).toString();
             }
             preferencesEditor.putString(weekDays, days);
-        }
-        else{
+        } else {
             preferencesEditor.putString(weekDays, "");
         }
-
-        preferencesEditor.putString(startTime, config.StartTime.Save());
-        preferencesEditor.putString(endTime, config.EndTime.Save());
-        preferencesEditor.putString(breakTime, config.breakTimeInMinutes.toString());
-        preferencesEditor.putBoolean(firstTimeActivated, config.firstTimeActivated == null ? false : config.firstTimeActivated);
-
         preferencesEditor.apply();
 
     }
 
+    public Time getStartTime() {
+        return new Time(this.mPreferences.getString(startTime, "9:30"));
+    }
+
+    public void setStartTime(Config config) {
+        preferencesEditor.putString(startTime, config.StartTime.Save());
+        preferencesEditor.apply();
+
+    }
+
+    public Time getEndTime() {
+        return new Time(this.mPreferences.getString(endTime, "18:00"));
+    }
+
+    public void setEndTime(Config config) {
+        preferencesEditor.putString(endTime, config.EndTime.Save());
+        preferencesEditor.apply();
+
+    }
+
+    public BreakTime getBreakTime() {
+        return new BreakTime(this.mPreferences.getString(breakTime, "30 min"));
+    }
+
+    public void setBreakTime(Config config) {
+        preferencesEditor.putString(breakTime, config.breakTimeInMinutes.toString());
+        preferencesEditor.apply();
+
+    }
+
+    public void setActivated(Config config) {
+        this.preferencesEditor.putBoolean(activated, config.activated);
+        preferencesEditor.apply();
+
+    }
+
+    public void setFirstTimeActivated(Config config) {
+        preferencesEditor.putBoolean(firstTimeActivated, config.firstTimeActivated == null ? false : config.firstTimeActivated);
+        preferencesEditor.apply();
+
+    }
+
+    public void save(Config config) {
+
+        setActivated(config);
+        setWeekDays(config);
+        setBreakTime(config);
+        setFirstTimeActivated(config);
+        setStartTime(config);
+        setEndTime(config);
+
+    }
 
 
 }

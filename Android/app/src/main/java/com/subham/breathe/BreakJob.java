@@ -3,17 +3,11 @@ package com.subham.breathe;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -22,7 +16,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 
 public class BreakJob {
@@ -54,7 +47,7 @@ public class BreakJob {
         Time startTime = configPersistanceStorage.getStartTime();
         Time   endTime = configPersistanceStorage.getEndTime();
 
-        if (configPersistanceStorage.getWeekDays().indexOf(MaterialDayPicker.Weekday.values()[dayOfWeek]) != -1) {
+        if (configPersistanceStorage.getWeekDays().indexOf(dayOfWeek) != -1) {
             return currentTime.compare(currentTime, startTime) > -1
                     && currentTime.compare(currentTime, endTime) < 1;
         }

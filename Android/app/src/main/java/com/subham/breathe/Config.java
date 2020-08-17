@@ -3,14 +3,13 @@ package com.subham.breathe;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 class Config {
     public boolean activated;
     public String Id;
     public String Email;
     public String Name;
-    public List<MaterialDayPicker.Weekday> WorkDays;
+    public List<Integer> WorkDays;
     public Time StartTime;
     public Time EndTime;
     public BreakTime breakTimeInMinutes;
@@ -26,18 +25,8 @@ class Config {
     }
 
 
-
-    public void setWeekDays(MaterialDayPicker.Weekday day, boolean selected) {
-        if (this.WorkDays.contains(day)) {
-            if (! selected) {
-                this.WorkDays.remove(day);
-            }
-        }
-        else{
-            if (selected) {
-                this.WorkDays.add(day);
-            }
-        }
+    public void setWeekDays(List<Integer> days) {
+        this.WorkDays = days;
     }
 
     @Override

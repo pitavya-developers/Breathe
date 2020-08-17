@@ -2,6 +2,7 @@ package com.subham.breathe;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,12 +16,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import com.dpro.widgets.WeekdaysPicker;
 import com.judemanutd.autostarter.AutoStartPermissionHelper;
 
 import java.util.Calendar;
 import java.util.Objects;
 
-import ca.antonious.materialdaypicker.MaterialDayPicker;
 
 public class Home extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -50,10 +51,6 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     }
 
-    private boolean ifServiceRunning() {
-        return true;
-    }
-
     private void InitializeConfigParameters() {
         config = new Config();
 
@@ -61,23 +58,17 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         config.Name = configPersistanceStorage.getGName();
         config.Email = configPersistanceStorage.getGEmail();
         config.activated = configPersistanceStorage.getActivated();
-
-        if (config.activated) {
-            if (!ifServiceRunning()) {
-                breakService.startBreakService(configPersistanceStorage.getBreakTime().time);
-            }
-        } else {
-            config.WorkDays = configPersistanceStorage.getWeekDays();
-            config.StartTime = configPersistanceStorage.getStartTime();
-            config.EndTime = configPersistanceStorage.getEndTime();
-            config.breakTimeInMinutes = configPersistanceStorage.getBreakTime();
-        }
+        config.WorkDays = configPersistanceStorage.getWeekDays();
+        config.StartTime = configPersistanceStorage.getStartTime();
+        config.EndTime = configPersistanceStorage.getEndTime();
+        config.breakTimeInMinutes = configPersistanceStorage.getBreakTime();
 
     }
 
     private void setUI() {
-        ((MaterialDayPicker) findViewById(R.id.day_picker)).setSelectedDays(config.WorkDays);
-        ((TextView) findViewById(R.id.home_work_start_time)).setText(config.EndTime.toString());
+        ((WeekdaysPicker) findViewById(R.id.weekdays)).setSelectedDays(config.WorkDays);
+
+        ((TextView) findViewById(R.id.home_work_end_time)).setText(config.EndTime.toString());
         ((TextView) findViewById(R.id.home_work_start_time)).setText(config.StartTime.toString());
         ((Switch) findViewById(R.id.home_activate_switch)).setChecked(config.activated);
         ((TextView) findViewById(R.id.home_greeting_to)).setText(config.Name);
@@ -99,12 +90,14 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
         if (((Switch) V).isChecked()) {
             config.activated = true;
             config.firstTimeActivated = true;
-            configPersistanceStorage.update(config);
+            configPersistanceStorage.setActivated(config);
+            configPersistanceStorage.setFirstTimeActivated(config);
             breakService.startBreakService(configPersistanceStorage.getBreakTime().time);
         } else {
             config.activated = false;
             config.firstTimeActivated = false;
-            configPersistanceStorage.update(config);
+            configPersistanceStorage.setActivated(config);
+            configPersistanceStorage.setFirstTimeActivated(config);
             breakService.stopBreakService();
         }
     }
@@ -123,11 +116,11 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
                     if (V.getId() == R.id.home_work_start_time) {
                         config.StartTime = time;
-                        configPersistanceStorage.update(config);
+                        configPersistanceStorage.setStartTime(config);
 
                     } else {
                         config.EndTime = new Time(hourOfDay, minute);
-                        configPersistanceStorage.update(config);
+                        configPersistanceStorage.setEndTime(config);
 
                     }
                 }, mHour, mMinute, false);
@@ -135,11 +128,14 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
     }
 
     public void dayChangeChooser() {
-        ((MaterialDayPicker) findViewById(R.id.day_picker))
-                .setDayPressedListener((weekday, b) -> {
-                    config.setWeekDays(weekday, b);
-                    configPersistanceStorage.update(config);
-                });
+
+        WeekdaysPicker widget = (WeekdaysPicker) findViewById(R.id.weekdays);
+        widget.setOnWeekdaysChangeListener((view, clickedDayOfWeek, selectedDays) -> {
+
+            config.setWeekDays(selectedDays);
+            configPersistanceStorage.setWeekDays(config);
+
+        });
     }
 
     // frequency spinner
@@ -158,9 +154,12 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
         String item = parent.getItemAtPosition(position).toString();
         config.breakTimeInMinutes = new BreakTime(item);
-        configPersistanceStorage.update(config);
+        configPersistanceStorage.setBreakTime(config);
+        breakService.stopBreakService();
+        breakService.startBreakService(config.breakTimeInMinutes.time);
     }
 
     @Override
